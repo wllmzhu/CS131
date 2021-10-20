@@ -38,36 +38,53 @@ let parse_tree_leaves tree =
 (* Question 3, a function make_matcher 'gram' that returns a matcher for the 
 grammar 'gram'. the matcher must try the grammar rules in order and return the
 result of calling accept on the suffix corresponding to the first acceptable
-matching prefix of frag*)
+matching prefix of frag *)
 let make_matcher (start, prod_function) = 
-    let rec match_rules rules acceptor frag =
-        match rules with
+    (* iterate over set of rhs (alt_list) to find an applicable one, evaluate 
+    each rhs and return the result of evaluation *)
+    let rec find_rhs alt_list acceptor frag =
+        match alt_list with
         | [] -> None
-        | h::t -> match_rules_helper h t acceptor frag
-    and match_rules_helper h t acceptor frag =
-        match (evaluate_suffix h acceptor frag) with
-        | None -> match_rules t acceptor frag
-        | x -> x
-    and evaluate_suffix expr acceptor frag =
-        if expr = [] then acceptor frag else
-        match frag with
-        | [] -> None
-        | h::t -> evaluate_suffix_helper h t expr acceptor frag
-    and evaluate_suffix_helper h t expr acceptor frag =
-        match expr with
-        | [] -> None
-        | x::y -> match_type x y h t acceptor frag
-    and match_type x y h t acceptor frag = 
-        match x with 
-        | T x -> if x = h then evaluate_suffix y acceptor t else None
-        | N x -> match_rules (prod_function x) (evaluate_suffix y acceptor) frag
+        | rhs::rest_rhs ->
+            (* if evaluate_frag gives None, then iterate to the next rhs. 
+            If not, then we found a good rule. Directly return the result *)
+            match (evaluate_frag rhs acceptor frag) with
+            | None -> find_rhs rest_rhs acceptor frag
+            | x -> x
+    (* evaluate_frag iterate over prefix and frag, eventually apply acceptor onto
+    the suffix (frag - prefix) and return the result (None or frag) *)
+    and evaluate_frag prefix acceptor frag =
+        (* if finished iterating through prefix, call acceptor to accept or reject
+        the suffix. Else, call match_type to switch on whether prefix is terminal
+        or nonterminal *)
+        match prefix with
+        | [] -> acceptor frag
+        | prefix_h::prefix_t ->
+            match frag with
+            | [] -> None
+            | frag_h::frag_t -> match_type prefix_h prefix_t frag_h frag_t acceptor frag
+            
+    and match_type prefix_h prefix_t frag_h frag_t acceptor frag = 
+        match prefix_h with 
+        (* if terminal, and if prefix head match with frag head, then iterate over prefix and
+        frag by getting rid of these two heads *)
+        | T prefix_h -> if prefix_h = frag_h then evaluate_frag prefix_t acceptor frag_t else None
+        (* if nonterminal, try to expand by trying all rules that are applicable to prefix head, 
+        use a partially applied evaluate_frag as the new acceptor *)
+        | N prefix_h -> find_rhs (prod_function prefix_h) (evaluate_frag prefix_t acceptor) frag
     in
-    let matcher acceptor frag = 
-        evaluate_suffix [(N start)] acceptor frag
-    in
-    matcher
+    evaluate_frag [(N start)]
 
 
+(* Question 4, a function make_parser gram that returns a parser for the grammar gram. When applied
+to a fragment frag, the parser returns an optional parse tree. If frag cannot be parsed entirely
+(that is, from beginning to end), the parser returns None. Otherwise, it returns Some tree where
+tree is the parse tree corresponding to the input fragment. Your parser should try grammar rules
+in the same order as make_matcher *)
+
+(* let make_parser (start, prod_function) =
+
+ *)
 
 
 
