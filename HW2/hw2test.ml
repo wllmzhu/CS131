@@ -27,10 +27,6 @@ let awksub_grammar = Expr, awksub_rules
 
 let new_awksub_grammar = convert_grammar awksub_grammar
 
-let convert_grammar_test0 = equal_sets
-                                ((snd new_awksub_grammar) Num)
-                                ([[T "0"]; [T "1"]])
-
 let awkish_grammar =
     (Expr,
     function
@@ -60,7 +56,25 @@ let awkish_grammar =
 
 let awk_frag = ["$"; "["; "$"; "1"; "++"; "]"; "-"; "0"; "!"]
 
-let parse_tree_leaves_test0 = 
+let acceptor_accept_nonempty frag =
+    match frag with
+    | [] -> None
+    | x -> Some x
+
+let convert_grammar_test = equal_sets
+                                ((snd new_awksub_grammar) Num)
+                                ([[T "0"]; [T "1"]])
+
+let make_matcher_test = 
+    (make_matcher awkish_grammar acceptor_accept_nonempty awk_frag) =
+    Some ["!"]
+
+let parse_tree_leaves_test = 
+    match make_parser awkish_grammar awk_frag with
+    | Some tree -> parse_tree_leaves tree = awk_frag
+    | _ -> false
+
+let parse_tree_leaves_test1 = 
     (make_parser awkish_grammar awk_frag) = 
       Some
         (Node (Expr,
@@ -80,4 +94,3 @@ let parse_tree_leaves_test0 =
             Node (Binop, [Leaf "-"]);
             Node (Expr,
             [Node (Term, [Node (Num, [Leaf "0"]); Node (Factorial, [Leaf "!"])])])]))
-

@@ -115,10 +115,10 @@ let make_parser (start, prod_function) =
                     in
                     find_rhs prefix_h prod_function (prod_function prefix_h) acceptor1 frag []       
     in
-    let acceptor_accept_empty frag tree =
+    let acceptor_accept_nonempty frag tree =
         match frag with
         | [] -> Some tree
         | _ -> None
     in
-    fun frag -> find_rhs start prod_function (prod_function start) acceptor_accept_empty frag []  
+    fun frag -> find_rhs start prod_function (prod_function start) acceptor_accept_nonempty frag []  
 
