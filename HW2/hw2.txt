@@ -1,0 +1,24 @@
+1. Clearly the matcher and the parser are super related. However, 
+I did not have time to figure out how to write the parser in terms
+of the matcher, and only borrowed the code structure (which
+is more than 90% the same). So to be honest, there is way too much
+duplications in the code that can be avoided, by taking find_rhs
+out side of the scope of make_matcher and make_parser, for example.
+
+2. In terms of weakness, the duplication of code is definitely a
+big one. In addition, I discovered that my implementation will 
+result in infinite recursion in certain situations. For example,
+I tried to add 
+        Term -> [N Expr; N Factorial]
+to the rules, but this would result in the infinite recursion, 
+since Expr is the first thing that the parser looks for, and can
+be expanded to Term by the first rule for Expr, and then back to
+this rule again. I was forced to change it to 
+        Term -> [N Num; N Factorial]
+        
+By observation, something like
+        Term -> [N Factorial; N Expr]
+Where the first symbol does not form the double-recursion, would
+not cause the infinite recursion.
+
+
