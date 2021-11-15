@@ -11,6 +11,12 @@ add_constraint(T, [First|Rest], S) :-
     S #= Num + Rest_S.
 
 mul_constraint(_, [], 1).
+mul_constraint(T, [Head|Tail], P):-
+        get_ele(T,Head,Ele),
+        mul_rule(T,Tail,Pro),
+        P #=  Ele * Pro.
+
+mul_constraint(_, [], 1).
 mul_constraint(T, [First|Rest], P) :-
     get_ele(T, First, Num),
     add_constraint(T, Rest, Rest_P),
