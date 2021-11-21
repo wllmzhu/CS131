@@ -158,7 +158,7 @@ plain_kenken(N, C, T) :-
     all_rows_satisfied_P(T, N),
     transpose(T, T_Trans),
     all_rows_satisfied_P(T_Trans, N),
-    all_constraints_satisfied_P(T, C),
+    all_constraints_satisfied_P(T, C).
 
 %=============== misc ================
 
@@ -201,6 +201,7 @@ kenken_testcase(
 %   real   time    1616.660 sec       0.000 sec
 
 %with the script
+%
 %statistics,
 %kenken(
 %  4,
@@ -218,9 +219,8 @@ kenken_testcase(
 %statistics.
 
 %================ no-op ====================
-%Constraints would become a list of list 
-%without the operations, compared to the original
-%kenken. 
+%Constraints would just like in the original but
+%without the operations
 %A new term called Ops should be passed in,
 %which is a list of a list of two elements like
 %this: [+, [[1|2],[1|3]]], where the first
@@ -235,8 +235,8 @@ kenken_testcase(
 % noop_kenken_testcase(
 %  2,
 %  [
-%   [[1|1], [2|1]],
-%   [1|2], [1|3]]
+%   [3, [[1|1], [2|1]]],
+%   [1, [1|2], [1|3]]]
 %  ]
 %).
 % 
